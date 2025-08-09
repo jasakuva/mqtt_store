@@ -1,0 +1,44 @@
+version: '3.8'
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: mystore_mysql_db_2
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: mqtt_data
+      MYSQL_USER: mqttdata
+      MYSQL_PASSWORD: mqttdata
+    ports:
+      - "3506:3306"
+    volumes:
+      - mystore_mysql_data_2:/var/lib/mysql
+
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: mystore_phpmyadmin_2
+    restart: always
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+      PMA_USER: root
+      PMA_PASSWORD: rootpassword
+    ports:
+      - "8380:80"
+    depends_on:
+      - mysql
+
+  mqtt_loader:
+    image: jasa-mqtt-to-mysql_2
+    container_name: mqtt-to-mysql_cont_2
+    restart: always
+    network_mode: host
+    environment:
+      MYSQL_PORT: 3506
+    depends_on:
+      - mysql
+
+
+volumes:
+  mystore_mysql_data_2:
